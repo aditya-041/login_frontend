@@ -1,101 +1,113 @@
-import Image from "next/image";
+"use client";
+import Link from 'next/link';
+import { useState } from 'react';
+import { FaFacebookF, FaLinkedinIn, FaGoogle, FaRegEnvelope } from 'react-icons/fa';
+import { MdLockOutline } from 'react-icons/md';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleLogin = async (event) => {
+    event.preventDefault(); 
+
+    const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + '/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem('token', data.token);
+      window.location.href = '/dashboard'; 
+    } else {
+      alert(data.message);
+    }
+  };
+
+  return (
+    <div className="bg-gray-100 grid place-items-center min-h-screen p-4">
+      <div className="bg-white rounded-2xl shadow-2xl flex flex-col md:flex-row w-full max-w-4xl">
+        {/* Left Section - Sign In */}
+        <div className="text-center md:w-3/5 p-6 md:p-12">
+          <div className="text-left font-bold text-2xl">
+            <span className="text-purple-600">Destion</span> Innovations
+          </div>
+          <div className="py-8">
+            <h2 className="text-3xl font-bold text-purple-600 mb-2">Sign in to Your Account</h2>
+            <div className="border-2 w-10 border-purple-600 inline-block mb-4 rounded-lg"></div>
+
+            <div className="flex justify-center my-4">
+              <a href="#" className='border-2 border-gray-200 rounded-full p-3 mx-1'>
+                <FaFacebookF className='text-sm'/>
+              </a>
+              <a href="#" className='border-2 border-gray-200 rounded-full p-3 mx-1'>
+                <FaLinkedinIn className='text-sm'/>
+              </a>
+              <a href="#" className='border-2 border-gray-200 rounded-full p-3 mx-1'>
+                <FaGoogle className='text-sm'/>
+              </a>
+            </div>
+
+            <p className="text-gray-400 mb-4">or login through your email</p>
+
+            <form className="flex flex-col items-center" onSubmit={handleLogin}>
+              <div className="bg-gray-100 p-2 w-full max-w-xs flex items-center mb-3">
+                <FaRegEnvelope className="text-gray-400 m-2" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  className="bg-gray-100 outline-none text-sm flex-1"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)} 
+                />
+              </div>
+
+              <div className="bg-gray-100 p-2 w-full max-w-xs flex items-center mb-3">
+                <MdLockOutline className="text-gray-400 m-2" />
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  className="bg-gray-100 outline-none text-sm flex-1"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)} 
+                />
+              </div>
+
+              <div className="flex justify-between w-full max-w-xs mb-5">
+                <label className="flex items-center text-sm text-gray-400">
+                  <input type="checkbox" name="Remember" className="mr-1" />
+                  Remember me
+                </label>
+                <a href="#" className="text-sm text-gray-400">Forgot Password?</a>
+              </div>
+
+              <button
+                type="submit" 
+                className="text-purple-600 border-2 border-purple-600 rounded-full px-12 py-2 inline-block font-semibold hover:bg-purple-600 hover:text-white">
+                Log in
+              </button>
+            </form>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Right Section - Message */}
+        <div className="w-full md:w-2/5 bg-purple-600 text-white text-center rounded-b-2xl md:rounded-tr-2xl md:rounded-br-2xl py-12 md:py-36 px-8">
+          <h2 className="text-3xl font-bold mb-2">Hi, there!</h2>
+          <div className="border-2 w-10 border-white inline-block mb-4 rounded-lg"></div>
+          <p className="mb-8 text-white">Not signed up yet? Sign up now and continue your journey!</p>
+          
+          <Link href="/signup">
+            <button className="border-2 border-white rounded-full px-12 py-2 inline-block font-semibold hover:bg-white hover:text-purple-600">
+              Sign Up
+            </button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
